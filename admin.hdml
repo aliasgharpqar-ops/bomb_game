@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fa">
+<link rel="stylesheet" href="style.css">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پنل مدیریت</title>
+</head>
+<body>
+  <h1>پنل مدیریت 💼</h1>
+  <div id="loginPanel">
+    <input type="password" id="adminPass" placeholder="رمز ورود">
+    <button id="enterPanel">ورود</button>
+  </div>
+
+  <div id="panelContent" style="display:none;">
+    <input type="text" id="userId" placeholder="آیدی کاربر (uid)">
+    <input type="number" id="amount" placeholder="مبلغ">
+    <button id="addMoney">افزودن پول</button>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBadO2yve513BzRqzF_4U44-Yj_cBgQgcw",
+      authDomain: "bombgame-d85f5.firebaseapp.com",
+      projectId: "bombgame-d85f5",
+      storageBucket: "bombgame-d85f5.firebasestorage.app",
+      messagingSenderId: "439739695924",
+      appId: "1:439739695924:web:93a6d282ec7e0debee5b61",
+      measurementId: "G-WVC57S6PJW"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    document.getElementById("enterPanel").addEventListener("click", () => {
+      const pass = document.getElementById("adminPass").value;
+      if (pass === "pqar0011") {
+        document.getElementById("loginPanel").style.display = "none";
+        document.getElementById("panelContent").style.display = "block";
+      } else {
+        alert("❌ رمز اشتباه است");
+      }
+    });
+
+    document.getElementById("addMoney").addEventListener("click", async () => {
+      const uid = document.getElementById("userId").value;
+      const amount = parseInt(document.getElementById("amount").value);
+
+      if (!uid || !amount) return alert("لطفا اطلاعات را کامل وارد کنید");
+
+      const userRef = db.collection("users").doc(uid);
+      const docSnap = await userRef.get();
+
+      if (docSnap.exists) {
+        const newBalance = (docSnap.data().balance || 0) + amount;
+        await userRef.update({ balance: newBalance });
+        alert("✅ موجودی کاربر بروز شد");
+      } else {
+        alert("❌ کاربر پیدا نشد");
+      }
+    });
+  </script>
+</body>
+</html>
