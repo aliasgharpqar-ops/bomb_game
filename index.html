@@ -3,44 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بازی تستی</title>
+  <title>ثبت نام / ورود</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>🔥 بازی انفجار (نسخه مقاله)</h1>
-  </header>
+  <h1>🔥 ورود به بازی انفجار</h1>
 
-  <main>
-    <div class="buttons">
-      <button id="loginBtn">ورود</button>
-      <button id="registerBtn">ثبت نام</button>
-    </div>
+  <button id="loginBtn">ورود</button>
+  <button id="registerBtn">ثبت نام</button>
 
-    <!-- فرم ورود -->
-    <div id="loginForm" class="form hidden">
-      <h2>ورود</h2>
-      <input type="email" id="loginEmail" placeholder="ایمیل">
-      <input type="password" id="loginPassword" placeholder="رمز عبور">
-      <button id="doLogin">ورود</button>
-    </div>
+  <div id="loginForm" class="form hidden">
+    <h2>ورود</h2>
+    <input type="email" id="loginEmail" placeholder="ایمیل">
+    <input type="password" id="loginPassword" placeholder="رمز عبور">
+    <button id="doLogin">ورود</button>
+  </div>
 
-    <!-- فرم ثبت نام -->
-    <div id="registerForm" class="form hidden">
-      <h2>ثبت نام</h2>
-      <input type="text" id="regUsername" placeholder="نام کاربری">
-      <input type="email" id="regEmail" placeholder="ایمیل">
-      <input type="password" id="regPassword" placeholder="رمز عبور">
-      <button id="doRegister">ثبت نام</button>
-    </div>
-  </main>
+  <div id="registerForm" class="form hidden">
+    <h2>ثبت نام</h2>
+    <input type="text" id="regUsername" placeholder="نام کاربری">
+    <input type="email" id="regEmail" placeholder="ایمیل">
+    <input type="password" id="regPassword" placeholder="رمز عبور">
+    <button id="doRegister">ثبت نام</button>
+  </div>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // کانفیگ مخصوص خودت
     const firebaseConfig = {
       apiKey: "AIzaSyBadO2yve513BzRqzF_4U44-Yj_cBgQgcw",
       authDomain: "bombgame-d85f5.firebaseapp.com",
@@ -53,8 +45,9 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.firestore();
   </script>
 
-  <script src="script.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>
