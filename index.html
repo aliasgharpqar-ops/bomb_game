@@ -4,36 +4,64 @@
   <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ثبت نام / ورود</title>
+  <title>ورود / ثبت نام</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background: #0d1117;
+      font-family: "Vazirmatn", sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .auth-box {
+      background: #161b22;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 0 20px rgba(0,255,0,0.3);
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      background: #0d1117;
+      color: white;
+      text-align: center;
+    }
+    button {
+      margin-top: 10px;
+      width: 100%;
+    }
+    h2 {
+      margin-bottom: 15px;
+      color: #22c55e;
+    }
+  </style>
 </head>
 <body>
-  <h1>🔥 ورود به بازی انفجار</h1>
-
-  <button id="loginBtn">ورود</button>
-  <button id="registerBtn">ثبت نام</button>
-
-  <div id="loginForm" class="form hidden">
-    <h2>ورود</h2>
-    <input type="email" id="loginEmail" placeholder="ایمیل">
-    <input type="password" id="loginPassword" placeholder="رمز عبور">
-    <button id="doLogin">ورود</button>
-  </div>
-
-  <div id="registerForm" class="form hidden">
-    <h2>ثبت نام</h2>
-    <input type="text" id="regUsername" placeholder="نام کاربری">
-    <input type="email" id="regEmail" placeholder="ایمیل">
-    <input type="password" id="regPassword" placeholder="رمز عبور">
-    <button id="doRegister">ثبت نام</button>
+  <div class="auth-box">
+    <h2>ورود / ثبت نام</h2>
+    <input type="email" id="email" placeholder="ایمیل">
+    <input type="password" id="password" placeholder="رمز عبور">
+    <button id="signupBtn">ثبت نام</button>
+    <button id="loginBtn">ورود</button>
+    <p id="message"></p>
   </div>
 
   <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script type="module">
+    // --- کانفیگ فایربیس خودتو اینجا بذار ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBadO2yve513BzRqzF_4U44-Yj_cBgQgcw",
       authDomain: "bombgame-d85f5.firebaseapp.com",
@@ -44,11 +72,49 @@
       measurementId: "G-WVC57S6PJW"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  </script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  <script src="index.js"></script>
+    const emailInput = document.getElementById("email");
+    const passInput = document.getElementById("password");
+    const signupBtn = document.getElementById("signupBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const message = document.getElementById("message");
+
+    // ثبت نام
+    signupBtn.addEventListener("click", async () => {
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, emailInput.value, passInput.value);
+        const user = userCredential.user;
+        // ایجاد پروفایل کاربر با پول صفر
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          balance: 0
+        });
+        message.textContent = "ثبت نام موفق! ورود...";
+        setTimeout(() => window.location.href = "game.html", 1500);
+      } catch (err) {
+        message.textContent = "خطا: " + err.message;
+      }
+    });
+
+    // ورود
+    loginBtn.addEventListener("click", async () => {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, emailInput.value, passInput.value);
+        const user = userCredential.user;
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (!userDoc.exists()) {
+          // اگه پروفایل نبود بسازه
+          await setDoc(doc(db, "users", user.uid), { email: user.email, balance: 0 });
+        }
+        message.textContent = "ورود موفق!";
+        setTimeout(() => window.location.href = "game.html", 1500);
+      } catch (err) {
+        message.textContent = "خطا: " + err.message;
+      }
+    });
+  </script>
 </body>
 </html>
