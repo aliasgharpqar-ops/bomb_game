@@ -1,51 +1,54 @@
+/* استایل کلی */
 body {
-  font-family: Vazirmatn, sans-serif;
-  background: #f4f4f4;
-  margin: 0;
-  text-align: center;
-}
-
-header {
-  background: #222;
-  color: #fff;
-  padding: 15px;
-}
-
-.buttons {
-  margin: 20px;
-}
-
-button {
-  margin: 5px;
-  padding: 10px 20px;
-  font-size: 16px;
-  background: #28a745;
+  font-family: "Vazirmatn", sans-serif;
+  background: linear-gradient(135deg, #141e30, #243b55);
   color: white;
+  text-align: center;
+  padding: 30px;
+}
+
+/* دکمه‌ها */
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  background: #ff9800;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
 }
 button:hover {
-  background: #218838;
+  background: #e68900;
 }
 
+/* فرم‌ها */
 .form {
+  background: rgba(0,0,0,0.5);
+  padding: 20px;
   margin: 20px auto;
-  padding: 15px;
-  max-width: 300px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  border-radius: 10px;
+  width: 300px;
 }
 
 input {
-  display: block;
   width: 90%;
-  margin: 10px auto;
-  padding: 8px;
-  font-size: 14px;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: none;
+  text-align: center;
 }
 
 .hidden {
   display: none;
+}
+
+/* هدر بازی */
+header {
+  background: rgba(0,0,0,0.6);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 18px;
 }
