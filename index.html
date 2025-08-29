@@ -35,6 +35,26 @@
     </div>
   </main>
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+  <script>
+    // کانفیگ مخصوص خودت
+    const firebaseConfig = {
+      apiKey: "AIzaSyBadO2yve513BzRqzF_4U44-Yj_cBgQgcw",
+      authDomain: "bombgame-d85f5.firebaseapp.com",
+      projectId: "bombgame-d85f5",
+      storageBucket: "bombgame-d85f5.firebasestorage.app",
+      messagingSenderId: "439739695924",
+      appId: "1:439739695924:web:93a6d282ec7e0debee5b61",
+      measurementId: "G-WVC57S6PJW"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
+
   <script src="script.js"></script>
 </body>
 </html>
