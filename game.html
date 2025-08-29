@@ -3,30 +3,75 @@
 <link rel="stylesheet" href="style.css">
   <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>بازی انفجار</title>
-  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: #222;
+      color: #fff;
+    }
+    #balance {
+      font-weight: bold;
+      color: #4caf50;
+    }
+    canvas {
+      border: 2px solid #4caf50;
+      margin-top: 20px;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    input {
+      padding: 5px;
+      width: 100px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      margin-left: 10px;
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    #result {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <span id="username"></span> | 💰 موجودی: <span id="balance">0</span> تومان
+    <div>👤 <span id="username">کاربر</span></div>
+    <div>💰 موجودی: <span id="balance">0</span> تومان</div>
   </header>
 
-  <main>
-    <canvas id="chart" width="300" height="200"></canvas>
-    <div>
-      <input type="number" id="betAmount" placeholder="مبلغ شرط (تومان)">
-      <button id="placeBet">ثبت شرط</button>
-      <button id="cashout">برداشت</button>
-    </div>
-  </main>
+  <h2>🔥 بازی انفجار</h2>
+  <canvas id="chart" width="320" height="200"></canvas>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <div class="controls">
+    <input type="number" id="betAmount" placeholder="مبلغ (تومان)">
+    <button id="betBtn">ثبت شرط</button>
+  </div>
+
+  <p id="result"></p>
 
   <script>
+    // ✅ اتصال به Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBadO2yve513BzRqzF_4U44-Yj_cBgQgcw",
       authDomain: "bombgame-d85f5.firebaseapp.com",
@@ -37,11 +82,109 @@
       measurementId: "G-WVC57S6PJW"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    const app = firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-  </script>
 
-  <script src="game.js"></script>
+    let userId = null;
+    let balance = 0;
+    let inGame = false;
+    let betAmount = 0;
+
+    const balanceEl = document.getElementById("balance");
+    const usernameEl = document.getElementById("username");
+    const betBtn = document.getElementById("betBtn");
+    const betInput = document.getElementById("betAmount");
+    const resultEl = document.getElementById("result");
+    const canvas = document.getElementById("chart");
+    const ctx = canvas.getContext("2d");
+
+    // 🎯 وقتی کاربر لاگین کرد
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        userId = user.uid;
+        usernameEl.textContent = user.email.split("@")[0];
+
+        // گرفتن موجودی
+        const userDoc = await db.collection("users").doc(userId).get();
+        if (userDoc.exists) {
+          balance = userDoc.data().balance || 0;
+          balanceEl.textContent = balance;
+        } else {
+          await db.collection("users").doc(userId).set({ balance: 0 });
+        }
+      } else {
+        window.location.href = "index.html"; // اگر لاگین نکرده → برگرده
+      }
+    });
+
+    // 📊 رسم نمودار
+    function drawChart(multiplier) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.beginPath();
+      ctx.moveTo(10, canvas.height - 10);
+      ctx.lineTo(300, canvas.height - multiplier * 20);
+      ctx.strokeStyle = "green";
+      ctx.stroke();
+
+      ctx.fillStyle = "black";
+      ctx.font = "16px Arial";
+      ctx.fillText(multiplier.toFixed(2) + "x", 250, canvas.height - multiplier * 20 - 5);
+    }
+
+    // 🚀 شروع بازی
+    function startGame() {
+      inGame = true;
+      resultEl.textContent = "";
+
+      let multiplier = 1.0;
+      const crashPoint = (Math.random() * 5 + 1).toFixed(2);
+
+      const interval = setInterval(() => {
+        multiplier += 0.05;
+        drawChart(multiplier);
+
+        if (multiplier >= crashPoint) {
+          clearInterval(interval);
+          inGame = false;
+          resultEl.textContent = "💥 بازی ترکید! ضریب: " + crashPoint;
+        }
+      }, 200);
+    }
+
+    // 🎰 ثبت شرط
+    betBtn.addEventListener("click", async () => {
+      if (inGame) return;
+      betAmount = parseInt(betInput.value);
+
+      if (!betAmount || betAmount <= 0) {
+        alert("مبلغ شرط را درست وارد کنید");
+        return;
+      }
+      if (betAmount > balance) {
+        alert("موجودی کافی نیست");
+        return;
+      }
+
+      balance -= betAmount;
+      balanceEl.textContent = balance;
+      await db.collection("users").doc(userId).update({ balance });
+
+      startGame();
+
+      setTimeout(async () => {
+        // برنده شدن به صورت شانسی
+        if (Math.random() > 0.5) {
+          const win = betAmount * 2;
+          balance += win;
+          resultEl.textContent = "🎉 بردی! جایزه: " + win + " تومان";
+          await db.collection("users").doc(userId).update({ balance });
+          balanceEl.textContent = balance;
+        } else {
+          resultEl.textContent = "❌ باختی!";
+        }
+      }, 6000);
+    });
+  </script>
 </body>
 </html>
