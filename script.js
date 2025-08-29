@@ -16,12 +16,30 @@ registerBtn.addEventListener("click", () => {
   loginForm.classList.add("hidden");
 });
 
-// کلیک روی "ورود"
-document.getElementById("doLogin").addEventListener("click", () => {
-  alert("✅ ورود موفق (این فقط تستیه)");
+// ثبت‌نام
+document.getElementById("doRegister").addEventListener("click", async () => {
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
+
+  try {
+    await auth.createUserWithEmailAndPassword(email, password);
+    alert("🎉 ثبت نام موفق!");
+  } catch (error) {
+    alert("❌ خطا: " + error.message);
+  }
 });
 
-// کلیک روی "ثبت‌نام"
-document.getElementById("doRegister").addEventListener("click", () => {
-  alert("🎉 ثبت‌نام موفق (این فقط تستیه)");
+// ورود
+document.getElementById("doLogin").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    alert("✅ ورود موفق!");
+    // اینجا می‌تونی ریدایرکت کنی به صفحه بازی
+    // window.location.href = "game.html";
+  } catch (error) {
+    alert("❌ خطا: " + error.message);
+  }
 });
